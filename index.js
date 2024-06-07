@@ -1,6 +1,10 @@
 const redux = require('redux');
 const createStore = redux.createStore; // creating a redux store but the syntax is deprecated
 const combineReducers = redux.combineReducers; // this is used to combine the reducers together
+const applyMiddleware = redux.applyMiddleware;
+
+const reduxLogger = require('redux-logger') // its a middle ware which prints all the logs that are happening in redux
+const logger = reduxLogger.createLogger() 
 
 const CAKE_ORDERED = 'CAKE_ORDERED'
 const CAKE_RESTOCKED = 'CAKE_RESTOCKED'
@@ -86,17 +90,16 @@ const icecreamReducer = (state = initialIcecreamState, action) => {
 
 // this reducer combines the reducer mentioned as parameters and then form a root reducer
 const rootReducer = combineReducers({
-
     cake: cakeReducer,
     icecream: icecreamReducer
 })
 
-// now we shall pass the root reducer as the reducer to the createStore method.
-
-const store = createStore(rootReducer)
+// now we are passing rootReducer and applyMiddleware as arguments to create store function
+const store = createStore(rootReducer, applyMiddleware(logger))
 console.log('initial store', store.getState())
 
-const subscribe = store.subscribe(() => console.log('state is ', store.getState()))
+const subscribe = store.subscribe(() => {}) // we don't need to console log anymore as the middle redux-logger is here 
+// to do exactly that.
 
 store.dispatch(orderCake())
 store.dispatch(orderCake())
