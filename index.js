@@ -1,13 +1,17 @@
 const redux = require('redux');
 const createStore = redux.createStore; // creating a redux store but the syntax is deprecated
+const combineReducers = redux.combineReducers; // this is used to combine the reducers together
 
 const CAKE_ORDERED = 'CAKE_ORDERED'
 const CAKE_RESTOCKED = 'CAKE_RESTOCKED'
 const ICECREAM_ORDERED = 'ICECREAM_ORDERED'
 const ICECREAM_RESTOCKED = 'ICECREAM_RESTOCKED'
 
-const initialState = {
+const initialCakeState = {
     numberOfCakes: 10,
+}
+
+const initialIcecreamState = {
     numberofIcecreams: 10
 }
 
@@ -41,10 +45,9 @@ function restockIcecream() {
     }
 }
 
-// a reducer needs to take an initial state and action
-// it performs an operation to the state based on the action and then returns the modified state
+// separation of the functionality
 
-const reducer = (state = initialState, action) => {
+const cakeReducer = (state = initialCakeState, action) => {
     switch(action.type) {
         case CAKE_ORDERED:
             return {
@@ -56,7 +59,13 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 numberOfCakes: state.numberOfCakes + action.payload
             }
+        default:
+            return state
+    }
+}
 
+const icecreamReducer = (state = initialIcecreamState, action) => {
+    switch(action.type) {
         case ICECREAM_ORDERED:
             return {
                 ...state, 
@@ -73,7 +82,18 @@ const reducer = (state = initialState, action) => {
     }
 }
 
-const store = createStore(reducer)
+
+
+// this reducer combines the reducer mentioned as parameters and then form a root reducer
+const rootReducer = combineReducers({
+
+    cake: cakeReducer,
+    icecream: icecreamReducer
+})
+
+// now we shall pass the root reducer as the reducer to the createStore method.
+
+const store = createStore(rootReducer)
 console.log('initial store', store.getState())
 
 const subscribe = store.subscribe(() => console.log('state is ', store.getState()))
